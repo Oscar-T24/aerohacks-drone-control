@@ -11,7 +11,7 @@ WiFiClient client;
 
 Adafruit_MPU6050 mpu;
 
-const String FIRMWARE_VERSION = "1";
+const String FIRMWARE_VERSION = "1.1";
 
 byte pinA = 4;
 byte pinB = 5;
@@ -31,11 +31,11 @@ float yaw = 0;
 float targetGyroX = 0;
 float targetGyroY = 0;
 
-double gyroOffsetX = 0;
-double gyroOffsetY = 0;
-double accOffsetX = 0;
-double accOffsetY = 0;
-double accOffsetZ = 0;
+float gyroOffsetX = 0;
+float gyroOffsetY = 0;
+float accOffsetX = 0;
+float accOffsetY = 0;
+float accOffsetZ = 0;
 
 float gyroX = 0;
 float gyroY = 0;
@@ -162,6 +162,12 @@ void loop() {
     else if (instruct == "gyroY") {client.print(String(gyroVY));}
     else if (instruct == "gMode") {client.print(String(mode));}
     else if (instruct == "vers") {client.print(FIRMWARE_VERSION);}
+    else if (instruct == "lb1") {digitalWrite(7, HIGH);}
+    else if (instruct == "lb0") {digitalWrite(7, LOW);}
+    else if (instruct == "lr1") {digitalWrite(8, HIGH);}
+    else if (instruct == "lr0") {digitalWrite(8, LOW);}
+    else if (instruct == "lg1") {digitalWrite(9, HIGH);}
+    else if (instruct == "lg0") {digitalWrite(9, LOW);}
     
     else if (instruct.startsWith("mode")) {
       instruct.remove(0, 4);

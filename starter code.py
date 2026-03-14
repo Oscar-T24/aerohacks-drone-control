@@ -57,7 +57,7 @@ def get_roll(): # unit close-ish to degrees, but not exact
 def get_gyro_pitch(): # pitch rate in degree/sec
     return float(msg("gyroX"))
 
-def get_gyro_pitch(): # roll rate in degree/sec
+def get_gyro_roll(): # roll rate in degree/sec
     return float(msg("gyroY"))
 
 # target pitch to aim for in mode 2
@@ -78,6 +78,15 @@ def set_i_gain(i): # below 0.00003
 
 def set_d_gain(d): # approx 0 - 10
     msg("gainD" + str(d))
+
+def red_LED(val): # controls LED light. 1 for on, 0 for off
+    msg("lr" + str(val))
+
+def blue_LED(val):
+    msg("lb" + str(val))
+
+def green_LED(val):
+    msg("lg" + str(val))
 
 def reset_integral(): # resets the value of integrands in the PID loops to 0
     msg("irst")
