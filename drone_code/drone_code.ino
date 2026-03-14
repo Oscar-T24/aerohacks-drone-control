@@ -17,11 +17,8 @@ byte pinC = 3;
 byte pinD = 6;
 
 byte mode = 0;
-//byte modeZ = 0;
 
-const float MAX_ANGULAR_VELOCITY = 5;
-const float MAX_ANGLE = 20;
-const float MAX_SPEED = 1; // arbitrary change later
+const float MAX_ANGLE = 300;
 const byte TURNING_THRUST_LIMIT = 120;
 float P = 0.02;
 float I = 0.00001;
@@ -62,20 +59,6 @@ void setup() {
   digitalWrite(9, LOW);
 
   delay(3000);
-	/*ESP32PWM::allocateTimer(0);
-	ESP32PWM::allocateTimer(1);
-	ESP32PWM::allocateTimer(2);
-	ESP32PWM::allocateTimer(3);
-
-
-	A.setPeriodHertz(50);
-	A.attach(pinA, 2, 19000);
-	B.setPeriodHertz(50);
-	B.attach(pinB, 2, 19000);
-	C.setPeriodHertz(50);
-	C.attach(pinC, 2, 19000);
-	D.setPeriodHertz(50);
-	D.attach(pinD, 2, 19000);*/
 
   Wire.begin(11,10);
   if (!mpu.begin(0x68)) {
@@ -144,14 +127,19 @@ void loop() {
   float gyroVY = g.gyro.y - gyroOffsetY;
   gyroX -= gyroVX * dt;
   gyroY -= gyroVY * dt;
+  /*
   float rawAccZ = a.acceleration.z - accOffsetZ;
   float rawAccX = a.acceleration.x - accOffsetX;
   float rawAccY = a.acceleration.y - accOffsetY;
   float accZ = rawAccZ * cos(gyroX * PI/180) * cos(gyroY * PI/180) - rawAccX * sin(gyroX * PI/180) - rawAccY * sin(gyroY * PI/180);
   float accX = rawAccX * cos(gyroX * PI/180) + rawAccZ * sin(gyroX * PI/180);
   float accY = rawAccY * cos(gyroY * PI/180) + rawAccZ * sin(gyroY * PI/180);
+  */
 
-
+  if (gyroX > MAX_ANGLE or gyroX < -MAX_ANGLE or gyroY > MAX_ANGLE or gyroY < -MAX_ANGLE) {
+    mode = 0;
+    digitalWrite(8, HIGH);
+  }
 
   if (!client) {client = tcpServer.available();}
   else if (!client.connected()) {
@@ -315,11 +303,6 @@ void loop() {
   if (thrustOffB > TURNING_THRUST_LIMIT) {thrustOffB = TURNING_THRUST_LIMIT;}
   if (thrustOffC > TURNING_THRUST_LIMIT) {thrustOffC = TURNING_THRUST_LIMIT;}
   if (thrustOffD > TURNING_THRUST_LIMIT) {thrustOffD = TURNING_THRUST_LIMIT;}
-
-  //A.write(thrustA);
-  //B.write(thrustB);
-  //C.write(thrustC);
-  //D.write(thrustD);
 
   int newThrustA = thrustA + thrustOffA - yaw;
   int newThrustB = thrustB + thrustOffB + yaw;
