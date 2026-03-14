@@ -20,7 +20,7 @@ byte pinD = 6;
 
 byte mode = 0;
 
-const float MAX_ANGLE = 750;
+const float MAX_ANGLE = 800;
 const byte TURNING_THRUST_LIMIT = 120;
 float P = 0.02;
 float I = 0.00001;
@@ -31,11 +31,11 @@ float yaw = 0;
 float targetGyroX = 0;
 float targetGyroY = 0;
 
-float gyroOffsetX = 0;
-float gyroOffsetY = 0;
-float accOffsetX = 0;
-float accOffsetY = 0;
-float accOffsetZ = 0;
+double gyroOffsetX = 0;
+double gyroOffsetY = 0;
+double accOffsetX = 0;
+double accOffsetY = 0;
+double accOffsetZ = 0;
 
 float gyroX = 0;
 float gyroY = 0;
@@ -75,7 +75,7 @@ void setup() {
   
   sensors_event_t a, g, temp;
 
-  unsigned int numCalibReadings = 2000;
+  unsigned int numCalibReadings = 3000;
 
   Serial.println("Callibrating, please wait");
 
