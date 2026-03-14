@@ -15,4 +15,4 @@ requires-python = ">=3.8"
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/McGill-Aerial-Design/aerohacks-drone-control"
+Homepage = "https://github.com/Oscar-T24/aerohacks-drone-control"
