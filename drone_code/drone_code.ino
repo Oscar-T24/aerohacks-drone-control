@@ -22,7 +22,7 @@ byte mode = 0;
 const float MAX_ANGULAR_VELOCITY = 5;
 const float MAX_ANGLE = 20;
 const float MAX_SPEED = 1; // arbitrary change later
-const byte TURNING_THRUST_LIMIT = 50;
+const byte TURNING_THRUST_LIMIT = 120;
 float P = 0.02;
 float I = 0.00001;
 float D = 5;
@@ -42,7 +42,8 @@ float gyroX = 0;
 float gyroY = 0;
 float lastGyroX = 0;
 float lastGyroY = 0;
-float I_val = 0;
+float I_valX = 0;
+float I_valY = 0;
 
 int thrustA = 0;
 int thrustB = 0;
@@ -59,6 +60,8 @@ void setup() {
   digitalWrite(7, HIGH); // LED blue
   digitalWrite(8, LOW);
   digitalWrite(9, LOW);
+
+  delay(3000);
 	/*ESP32PWM::allocateTimer(0);
 	ESP32PWM::allocateTimer(1);
 	ESP32PWM::allocateTimer(2);
@@ -206,7 +209,16 @@ void loop() {
       yaw = instruct.toFloat();
     }
     
-    else if (instruct == "irst") {I_val = 0;}
+    else if (instruct == "irst") {
+      I_valX = 0;
+      I_valY = 0;
+    }
+
+    else if (instruct == "geti"){
+      client.print(I_valX);
+      client.print(',');
+      client.print(I_valY);
+    }
 
     else if (instruct == "manT") {
       thrustA = client.readStringUntil(',').toInt();
@@ -234,17 +246,18 @@ void loop() {
   float thrustOffD = 0;
 
   if (mode == 2){
-    I_val += (gyroX - targetGyroX) * dt;
+    I_valX += (gyroX - targetGyroX) * dt;
+    I_valY += (gyroY - targetGyroY) * dt;
 
     thrustOffA -= P * (gyroX - targetGyroX) * dt;
     thrustOffB -= P * (gyroX - targetGyroX) * dt;
     thrustOffC += P * (gyroX - targetGyroX) * dt;
     thrustOffD += P * (gyroX - targetGyroX) * dt;
 
-    thrustOffA -= I * I_val * dt;
-    thrustOffB -= I * I_val * dt;
-    thrustOffC += I * I_val * dt;
-    thrustOffD += I * I_val * dt;
+    thrustOffA -= I * I_valX * dt;
+    thrustOffB -= I * I_valX * dt;
+    thrustOffC += I * I_valX * dt;
+    thrustOffD += I * I_valX * dt;
 
     thrustOffA += D * gyroVX * dt;
     thrustOffB += D * gyroVX * dt;
@@ -257,15 +270,15 @@ void loop() {
     thrustOffC -= P * (gyroY - targetGyroY) * dt;
     thrustOffD += P * (gyroY - targetGyroY) * dt;
 
-    thrustOffA -= I * I_val * dt;
-    thrustOffB += I * I_val * dt;
-    thrustOffC -= I * I_val * dt;
-    thrustOffD += I * I_val * dt;
+    thrustOffA -= I * I_valY * dt;
+    thrustOffB += I * I_valY * dt;
+    thrustOffC -= I * I_valY * dt;
+    thrustOffD += I * I_valY * dt;
 
     thrustOffA += D * gyroVY * dt;
     thrustOffB -= D * gyroVY * dt;
-    thrustOffC -= D * gyroVY * dt;
-    thrustOffD += D * gyroVY * dt;
+    thrustOffC += D * gyroVY * dt;
+    thrustOffD -= D * gyroVY * dt;
   }
 
 
@@ -280,6 +293,7 @@ void loop() {
 
 
   if (mode == 0) {
+    yaw = 0;
     thrustA = 0;
     thrustB = 0;
     thrustC = 0;
@@ -307,10 +321,10 @@ void loop() {
   //C.write(thrustC);
   //D.write(thrustD);
 
-  int newThrustA = thrustA + thrustOffA + yaw;
-  int newThrustB = thrustB + thrustOffB - yaw;
-  int newThrustC = thrustC + thrustOffC - yaw;
-  int newThrustD = thrustD + thrustOffD + yaw;
+  int newThrustA = thrustA + thrustOffA - yaw;
+  int newThrustB = thrustB + thrustOffB + yaw;
+  int newThrustC = thrustC + thrustOffC + yaw;
+  int newThrustD = thrustD + thrustOffD - yaw;
 
 
   if (newThrustA < 0) {newThrustA = 0;}
